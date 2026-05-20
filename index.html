@@ -560,62 +560,68 @@
 };
         function doLogin() {
 
-    const entered =
-    document.getElementById('pass-input')
-    .value.trim();
+    const inputPassword =
+    document.getElementById('pass-input').value.trim();
 
-    db.ref("roles").once("value")
-    .then((rolesSnap) => {
+    db.ref("roles").once("value").then((snap)=>{
 
-        const roles = rolesSnap.val();
+        const data = snap.val();
 
-        if(entered === roles.adminPassword){
+        const adminPass = data.adminPassword;
+
+        if(inputPassword === adminPass){
 
             localStorage.setItem("role", "admin");
 
             window.location.href =
             "admin-skin-tool.html";
 
-            return;
         }
 
-        if(entered === roles.userPassword){
+        else{
 
-            localStorage.setItem("isLogged", "true");
+            db.ref("users").once("value").then((userSnap)=>{
 
-            navigateTo("scr-menu");
+                const users = userSnap.val();
 
-            return;
+                let access = false;
+
+                for(let key in users){
+
+                    if(users[key] === inputPassword){
+
+                        access = true;
+
+                        break;
+
+                    }
+
+                }
+
+                if(access){
+
+                    localStorage.setItem("role", "user");
+
+                    localStorage.setItem("isLogged", "true");
+
+                    navigateTo('scr-menu');
+
+                }
+
+                else{
+
+                    document.getElementById('error-msg')
+                    .classList.remove('hidden');
+
+                    setTimeout(() =>
+                    document.getElementById('error-msg')
+                    .classList.add('hidden'), 2000);
+
+                }
+
+            });
+
         }
-
-        db.ref("keys/" + entered)
-        .once("value")
-        .then((keySnap) => {
-
-            if(keySnap.exists()){
-
-                localStorage.setItem(
-                "isLogged",
-                "true"
-                );
-
-                navigateTo("scr-menu");
-
-            } else {
-
-                document.getElementById("error-msg")
-                .classList.remove("hidden");
-
-                setTimeout(() => {
-
-                    document.getElementById("error-msg")
-                    .classList.add("hidden");
-
-                }, 2000);
-
-            }
-
-        });
 
     });
 
