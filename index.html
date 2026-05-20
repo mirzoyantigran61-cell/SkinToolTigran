@@ -560,44 +560,62 @@
 };
         function doLogin() {
 
-    const inputPassword =
-    document.getElementById('pass-input').value.trim();
+    const entered =
+    document.getElementById('pass-input')
+    .value.trim();
 
-    db.ref("roles").once("value").then((snap)=>{
+    db.ref("roles").once("value")
+    .then((rolesSnap) => {
 
-        const data = snap.val();
+        const roles = rolesSnap.val();
 
-        const adminPass = data.adminPassword;
-        const userPass = data.userPassword;
-
-        if(inputPassword === adminPass){
+        if(entered === roles.adminPassword){
 
             localStorage.setItem("role", "admin");
 
+            window.location.href =
+            "admin_SKIN TOOL.html";
+
+            return;
+        }
+
+        if(entered === roles.userPassword){
+
             localStorage.setItem("isLogged", "true");
 
-            window.location.href = "admin-skin-tool.html";
+            navigateTo("scr-menu");
 
+            return;
         }
-        else if(inputPassword === userPass){
 
-            localStorage.setItem("role", "user");
+        db.ref("keys/" + entered)
+        .once("value")
+        .then((keySnap) => {
 
-            localStorage.setItem("isLogged", "true");
+            if(keySnap.exists()){
 
-            navigateTo('scr-menu');
+                localStorage.setItem(
+                "isLogged",
+                "true"
+                );
 
-        }
-        else{
+                navigateTo("scr-menu");
 
-            document.getElementById('error-msg')
-            .classList.remove('hidden');
+            } else {
 
-            setTimeout(() =>
-            document.getElementById('error-msg')
-            .classList.add('hidden'), 2000);
+                document.getElementById("error-msg")
+                .classList.remove("hidden");
 
-        }
+                setTimeout(() => {
+
+                    document.getElementById("error-msg")
+                    .classList.add("hidden");
+
+                }, 2000);
+
+            }
+
+        });
 
     });
 
