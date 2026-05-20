@@ -569,17 +569,19 @@
 
         const adminPass = data.adminPassword;
 
+        // ADMIN LOGIN
         if(inputPassword === adminPass){
 
             localStorage.setItem("role", "admin");
 
             window.location.href =
-            "admin-skin-tool.html";
+            "admin_SKIN TOOL.html";
 
         }
 
         else{
 
+            // CHECK USERS
             db.ref("users").once("value").then((userSnap)=>{
 
                 const users = userSnap.val();
@@ -598,6 +600,7 @@
 
                 }
 
+                // IF USER FOUND
                 if(access){
 
                     localStorage.setItem("role", "user");
@@ -610,12 +613,47 @@
 
                 else{
 
-                    document.getElementById('error-msg')
-                    .classList.remove('hidden');
+                    // CHECK GENERATED KEYS
+                    db.ref("keys").once("value").then((keySnap)=>{
 
-                    setTimeout(() =>
-                    document.getElementById('error-msg')
-                    .classList.add('hidden'), 2000);
+                        const keys = keySnap.val();
+
+                        let keyAccess = false;
+
+                        for(let key in keys){
+
+                            if(key === inputPassword){
+
+                                keyAccess = true;
+
+                                break;
+
+                            }
+
+                        }
+
+                        if(keyAccess){
+
+                            localStorage.setItem("role", "user");
+
+                            localStorage.setItem("isLogged", "true");
+
+                            navigateTo('scr-menu');
+
+                        }
+
+                        else{
+
+                            document.getElementById('error-msg')
+                            .classList.remove('hidden');
+
+                            setTimeout(() =>
+                            document.getElementById('error-msg')
+                            .classList.add('hidden'), 2000);
+
+                        }
+
+                    });
 
                 }
 
@@ -626,7 +664,6 @@
     });
 
 }
-
         function showList(type) {
             const container = document.getElementById('items-container');
             container.innerHTML = `<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-green-500 mx-auto mt-20"></div>`;
