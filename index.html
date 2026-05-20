@@ -175,6 +175,7 @@
                 </div>
                 <button onclick="copyToClipboard('pass-link-display', 'copy-btn-text')" id="copy-btn-text" class="btn-action !mt-0 !w-full !bg-blue-600">COPY PASSWORD LINK</button>
                 <button id="visit-pass-btn" class="btn-action !mt-0 !w-full">VISIT NOW</button>
+                <button onclick="generateKey()"class="btn-action !w-full !bg-green-600 !mt-3">REGISTER KEY</button>
             </div>
             <p class="text-[11px] mt-6 text-gray-500 italic">TIGRAN SKIN TOOL.</p>
         </div>
@@ -729,6 +730,48 @@ function logoutUser(){
     window.location.hash = "scr-login";
 
     showScreen("scr-login");
+
+}
+
+    function generateKey(){
+
+    const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    let key = "RG-";
+
+    for(let i = 0; i < 4; i++){
+
+        key += chars.charAt(
+        Math.floor(Math.random() * chars.length)
+        );
+
+    }
+
+    key += "-";
+
+    for(let i = 0; i < 4; i++){
+
+        key += chars.charAt(
+        Math.floor(Math.random() * chars.length)
+        );
+
+    }
+
+    const keyData = {
+        key: key,
+        active: true,
+        createdAt: Date.now()
+    };
+
+    db.ref("keys/" + key).set(keyData)
+    .then(() => {
+
+        alert("YOUR KEY:\n" + key);
+
+        navigator.clipboard.writeText(key);
+
+    });
 
 }
 
